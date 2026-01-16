@@ -1,3 +1,4 @@
+import 'dart:math';
 /// NMODM Game Configuration
 /// 
 /// Represents the immutable configuration of an NMODM game instance.
@@ -20,6 +21,17 @@ class NmodmConfig {
   /// Standard mode configuration
   factory NmodmConfig.standard() {
     return const NmodmConfig(k: 0, m: 10, t: 100);
+  }
+
+  /// Random mode configuration
+  factory NmodmConfig.random() {
+    final Random random = Random();
+
+    int start = random.nextInt(102);
+    int range = 3 + random.nextInt(27);
+    int target = start + 51 + random.nextInt(151);
+
+    return  NmodmConfig(k: start, m: range, t: target);
   }
 
   /// Create config from JSON

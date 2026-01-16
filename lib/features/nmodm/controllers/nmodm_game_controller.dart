@@ -19,6 +19,9 @@ import '../domain/nmodm_game_engine.dart';
 class NmodmGameController extends StateNotifier<NmodmState> {
   static const String _gameId = 'nmodm';
 
+  final List<NmodmState> _past = [];
+  final List<NmodmState> _future = [];
+
   NmodmGameController(NmodmConfig config)
       : super(NmodmGameEngine.createGame(config));
 
@@ -47,6 +50,10 @@ class NmodmGameController extends StateNotifier<NmodmState> {
   void makeMove(int targetPosition) {
     try {
       final newState = NmodmGameEngine.makeMove(state, targetPosition);
+
+      _past.add(state);   // save snapshot
+      _future.clear();    // invalidate redo history
+
       state = newState;
       _saveGameState();
     } catch (e) {
@@ -58,12 +65,18 @@ class NmodmGameController extends StateNotifier<NmodmState> {
 
   /// Reset game
   void resetGame() {
+    _past.clear();
+    _future.clear();
+
     state = NmodmGameEngine.resetGame(state);
     _saveGameState();
   }
 
   /// Start new game with different config
   void startNewGame(NmodmConfig config) {
+    _past.clear();
+    _future.clear();
+
     state = NmodmGameEngine.createGame(config);
     _saveGameState();
   }
@@ -78,6 +91,27 @@ class NmodmGameController extends StateNotifier<NmodmState> {
     localStorageService.saveGameState(_gameId, state.toJson());
   }
 
+  //undo game state
+  void undo() {
+    if (!canUndo) return;
+
+    _future.add(state);
+    state = _past.removeLast();
+
+    _saveGameState();
+  }
+
+  //redo game state
+  void redo() {
+    if (!canRedo) return;
+
+    _past.add(state);
+    state = _future.removeLast();
+
+    _saveGameState();
+  }
+
+
   /// Get valid moves for current position
   List<int> getValidMoves() {
     return NmodmGameEngine.getValidMoves(state);
@@ -87,6 +121,19 @@ class NmodmGameController extends StateNotifier<NmodmState> {
   bool canWinInOneMove() {
     return NmodmGameEngine.canWinInOneMove(state);
   }
+
+  // bool canUndo(){
+  //   return _past.isNotEmpty;
+  // }
+
+  // bool canRedo(){
+  //   return _future.isNotEmpty;
+  // }
+
+  bool get canUndo => _past.isNotEmpty;
+  bool get canRedo => _future.isNotEmpty;
+
+
 }
 
 /// Provider family for creating game controllers with different configs

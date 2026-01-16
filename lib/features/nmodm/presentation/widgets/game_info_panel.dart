@@ -11,11 +11,19 @@ import '../../domain/models/nmodm_state.dart';
 class GameInfoPanel extends StatelessWidget {
   final NmodmState gameState;
   final bool isAnimating;
+  final VoidCallback? onUndo;
+  final VoidCallback? onRedo;
+  final bool canUndo;
+  final bool canRedo;
 
   const GameInfoPanel({
     super.key,
     required this.gameState,
     required this.isAnimating,
+    required this.onUndo,
+    required this.onRedo,
+    required this.canUndo,
+    required this.canRedo,
   });
 
   @override

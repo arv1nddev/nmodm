@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/di/injection_container.dart';
 import '../../../core/domain/game_registry.dart';
 import '../controllers/settings_controller.dart';
 
@@ -94,7 +93,7 @@ class SettingsScreen extends ConsumerWidget {
                   const ListTile(
                     leading: Icon(Icons.info_outline),
                     title: Text('Version'),
-                    subtitle: Text('1.0.0'),
+                    subtitle: Text('1.2.0'),
                   ),
                   const ListTile(
                     leading: Icon(Icons.code),

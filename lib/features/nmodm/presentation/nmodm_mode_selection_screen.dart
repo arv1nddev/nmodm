@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/di/injection_container.dart';
 import '../domain/models/nmodm_config.dart';
+import '../controllers/nmodm_game_controller.dart';
 
 /// NMODM Mode Selection Screen
 /// 
@@ -44,6 +45,16 @@ class NmodmModeSelectionScreen extends ConsumerWidget {
                       icon: Icons.trending_up,
                       onTap: () {
                         final config = NmodmConfig.standard();
+                        context.push('/nmodm/game', extra: config);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _ModeCard(
+                      title: 'Random Mode',
+                      description: 'Feasible values assigned randomly by computer',
+                      icon: Icons.shuffle,
+                      onTap: () {
+                        final config = NmodmConfig.random();
                         context.push('/nmodm/game', extra: config);
                       },
                     ),
@@ -179,14 +190,16 @@ class _ModeCard extends StatelessWidget {
   }
 }
 
-class _CustomModeDialog extends StatefulWidget {
+class _CustomModeDialog extends ConsumerStatefulWidget {
   const _CustomModeDialog();
 
   @override
-  State<_CustomModeDialog> createState() => _CustomModeDialogState();
+  ConsumerState<_CustomModeDialog> createState() =>
+      _CustomModeDialogState();
 }
 
-class _CustomModeDialogState extends State<_CustomModeDialog> {
+
+class _CustomModeDialogState  extends ConsumerState<_CustomModeDialog> {
   final _formKey = GlobalKey<FormState>();
   final _kController = TextEditingController(text: '0');
   final _mController = TextEditingController(text: '10');
@@ -291,6 +304,10 @@ class _CustomModeDialogState extends State<_CustomModeDialog> {
                 t: int.parse(_tController.text),
               );
               
+              ref
+                .read(nmodmGameControllerLoadOrCreateProvider(config).notifier)
+                .resetGame();
+
               Navigator.of(context).pop();
               context.push('/nmodm/game', extra: config);
             }

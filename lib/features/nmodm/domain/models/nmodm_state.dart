@@ -12,7 +12,7 @@ enum GameStatus { playing, won }
 /// - Immutable state object
 /// - Contains all information needed to represent game at any point
 /// - Can be serialized for persistence
-/// - Supports undo/redo (future enhancement)
+/// - Supports undo/redo 
 class NmodmState {
   final NmodmConfig config;
   final int currentPosition;

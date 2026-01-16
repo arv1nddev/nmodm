@@ -28,6 +28,7 @@ class NmodmGameScreen extends ConsumerStatefulWidget {
 
 class _NmodmGameScreenState extends ConsumerState<NmodmGameScreen> {
   bool _isAnimating = false;
+  bool _showWinDialogClosed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +57,10 @@ class _NmodmGameScreenState extends ConsumerState<NmodmGameScreen> {
           GameInfoPanel(
             gameState: gameState,
             isAnimating: _isAnimating,
+            canUndo: controller.canUndo,
+            canRedo: controller.canRedo,
+            onUndo: controller.undo,
+            onRedo: controller.redo,
           ),
           
           const Divider(height: 1),
@@ -75,13 +80,43 @@ class _NmodmGameScreenState extends ConsumerState<NmodmGameScreen> {
           ),
           
           // Bottom Action Bar
-          if (gameState.status == GameStatus.won)
+          if (gameState.status == GameStatus.won && _showWinDialogClosed)
             _WinnerBanner(
               winner: gameState.winner!,
-              onPlayAgain: () => controller.resetGame(),
+              onPlayAgain: () {
+                controller.resetGame();
+                setState(() {
+                  _showWinDialogClosed = false;
+                });
+              },
               onExit: () => context.pop(),
             ),
         ],
+      ),
+
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton.icon(
+                onPressed: controller.canUndo && !_isAnimating && gameState.status == GameStatus.playing
+                    ? controller.undo
+                    : null,
+                icon: const Icon(Icons.undo),
+                label: const Text('Undo'),
+              ),
+              TextButton.icon(
+                onPressed: controller.canRedo && !_isAnimating && gameState.status == GameStatus.playing
+                    ? controller.redo
+                    : null,
+                icon: const Icon(Icons.redo),
+                label: const Text('Redo'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -140,44 +175,99 @@ class _NmodmGameScreenState extends ConsumerState<NmodmGameScreen> {
   void _showWinDialog(BuildContext context, Player winner) {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Stack(
           children: [
-            Icon(
-              Icons.emoji_events,
-              color: Colors.amber,
-              size: 32,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.emoji_events,
+                        color: Colors.amber,
+                        size: 32,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Victory!',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Content
+                  Text(
+                    '${winner.displayName} wins!',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Actions
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            context.pop();
+                          },
+                          child: const Text('Exit'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            ref.read(
+                              nmodmGameControllerLoadOrCreateProvider(
+                                widget.config,
+                              ).notifier,
+                            ).resetGame();
+                          },
+                          child: const Text('Play Again'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(width: 12),
-            Text('Victory!'),
+
+            Positioned(
+              top: 4,
+              left: 4,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: 'Close',
+                onPressed: () {
+                   setState(() {
+                    _showWinDialogClosed = true;
+                  });
+                   Navigator.of(context).pop();
+                }
+              ),
+            ),
           ],
         ),
-        content: Text(
-          '${winner.displayName} wins!',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.pop();
-            },
-            child: const Text('Exit'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(
-                nmodmGameControllerLoadOrCreateProvider(widget.config).notifier,
-              ).resetGame();
-            },
-            child: const Text('Play Again'),
-          ),
-        ],
       ),
     );
   }
+
 
   void _showResetDialog(BuildContext context, NmodmGameController controller) {
     showDialog(
