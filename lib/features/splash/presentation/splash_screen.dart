@@ -34,17 +34,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final skipGameSelection = localStorageService.getSkipGameSelection();
     final defaultGameId = localStorageService.getDefaultGame();
 
+    // Navigate to game selection
+    context.go('/game-selection');
+
     if (skipGameSelection && defaultGameId != null) {
       // Navigate directly to default game
       final game = GameRegistry.getGameById(defaultGameId);
       if (game != null) {
-        context.go(game.route);
+        context.push(game.route);
         return;
       }
     }
 
-    // Navigate to game selection
-    context.go('/game-selection');
   }
 
   @override
@@ -65,7 +66,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.games,
                 size: 120,
                 color: Colors.white,

@@ -213,7 +213,7 @@ class _CustomModeDialogState extends State<_CustomModeDialog> {
               TextFormField(
                 controller: _kController,
                 decoration: const InputDecoration(
-                  labelText: 'Starting Number (k)',
+                  labelText: 'Starting Number ', //k
                   helperText: 'Initial position',
                   border: OutlineInputBorder(),
                 ),
@@ -234,8 +234,8 @@ class _CustomModeDialogState extends State<_CustomModeDialog> {
               TextFormField(
                 controller: _mController,
                 decoration: const InputDecoration(
-                  labelText: 'Range Limit (m)',
-                  helperText: 'Can add 1 to m-1',
+                  labelText: 'Range Limit (L)', // m = L + 1
+                  helperText: 'Can add 1 to L',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -255,7 +255,7 @@ class _CustomModeDialogState extends State<_CustomModeDialog> {
               TextFormField(
                 controller: _tController,
                 decoration: const InputDecoration(
-                  labelText: 'Target Number (t)',
+                  labelText: 'Target Number ', //t
                   helperText: 'Number to reach',
                   border: OutlineInputBorder(),
                 ),

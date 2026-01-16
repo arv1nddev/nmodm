@@ -142,15 +142,15 @@ class _NmodmGameScreenState extends ConsumerState<NmodmGameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(
               Icons.emoji_events,
               color: Colors.amber,
               size: 32,
             ),
-            const SizedBox(width: 12),
-            const Text('Victory!'),
+            SizedBox(width: 12),
+            Text('Victory!'),
           ],
         ),
         content: Text(
@@ -237,7 +237,7 @@ class _WinnerBanner extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.emoji_events,
                   color: Colors.amber,
                   size: 28,
